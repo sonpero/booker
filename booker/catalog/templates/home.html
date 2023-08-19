@@ -12,23 +12,29 @@
           <h1>Library</h1>
       </header>
         <table>
+          {% for book in books %}
           <tr>
             <td>
-              <img alt="le petit prince" src="{% static 'prince.jpg' %}">
+              <img alt="{{book.title}}" src="{% static book.image_path %}">
             </td>
             <td class="bookname">
                 <table class="top">
-                <tr> <td> Le Petit Prince </td></tr>
-                <tr> <td> Antoine de Saint Exupery </td></tr>
+                <tr> <td> {{ book.title }} </td></tr>
+                <tr> <td> {{ book.author }} </td></tr>
                 </table>
             </td>
-            <td class="bottom"> year: 1900 </td>
-            <td class="bottom"> language : french </td>
-            <td class="bottom"> file: pdf, epub </td>
-            <td class="bottom"> rating: 8/10 </td>
+            <td class="bottom"> year: {{ book.publication_date }} </td>
+            <td class="bottom"> language : {{ book.language }} </td>
+            <td class="bottom"> rating: {{ book.rating }} </td>
+            <td class="bottom"> file: {{ book.file_type }} </td>
+            <td class="bottom">
+              <a href="{% static book.file_path %}" download>Download</a>
+            </td>
           </tr>
+          {% endfor %}
         </table>
   </body>
 </html>
 
-<!--   style="vertical-align: top;" -->
+<!--   <a href="{% static 'Python_precis_concis.pdf' %}" download>Download</a>
+       <img alt="le petit prince" src="{% static 'prince.jpg' %}"> -->

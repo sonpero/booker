@@ -4,6 +4,9 @@ import requests
 titre_livre = "Le Petit Prince"
 auteur_livre = "Antoine de Saint-Exupéry"
 
+titre_livre = 'Une brève histoire du temps, du Big-bang aux trous noirs'
+auteur_livre = 'Stephen William Hawking'
+
 # Effectuer la requête à l'API Google Books
 url = "https://www.googleapis.com/books/v1/volumes?q=intitle:" + titre_livre + "+inauthor:" + auteur_livre
 response = requests.get(url)
@@ -11,7 +14,7 @@ response = requests.get(url)
 # Extraire l'URL de l'image de couverture du livre à partir de la réponse JSON
 data = response.json()
 if data['totalItems'] > 0:
-    livre = data['items'][0]['volumeInfo']
+    livre = data['items'][4]['volumeInfo']
     titre = livre['title']
     auteurs = livre['authors']
     date_parution = livre['publishedDate']

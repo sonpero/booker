@@ -16,11 +16,13 @@ services:
       - ./db:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
-      timeout: 5s
+      timeout: 50s
       retries: 10
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     environment:
@@ -30,8 +32,8 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
     volumes:
-      - .:/app
       - /tmp/app/mysqld:/run/mysqld
+      - .:/app
     depends_on:
       db:
         condition: service_healthy

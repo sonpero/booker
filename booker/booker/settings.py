@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-(5jj&)b$0003fkns5stlwv7o0zw-m#6q&=$hocegp8en-+yd97
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '192.168.1.9', '82.65.6.220']
+ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', '192.168.1.9', '82.65.6.220']
 
 
 # Application definition
@@ -75,29 +75,29 @@ WSGI_APPLICATION = 'booker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'booker_db',
-#         'USER': 'alex',
-#         'PASSWORD': 'Moskito1',
-#         'HOST': '127.0.0.1',
-#         'PORT': '3306',
-#         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"}
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
-        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+        'NAME': 'booker_db',
+        'USER': 'root',
+        'PASSWORD': 'Moskito1',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"}
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD'),
+#         'HOST': os.environ.get('DB_HOST'),
+#         'PORT': os.environ.get('DB_PORT'),
+#         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+#     }
+# }
 
 
 # Password validation

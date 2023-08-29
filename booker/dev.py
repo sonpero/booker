@@ -1,121 +1,115 @@
+
+# ----->    extract info from book file
+import os
+
+# PyMuPDF
+import fitz
 import requests
 
-# Définir le titre et l'auteur du livre
-titre_livre = "Le Petit Prince"
-auteur_livre = "Antoine de Saint-Exupéry"
+from ebooklib import epub
 
-titre_livre = 'Une brève histoire du temps, du Big-bang aux trous noirs'
-auteur_livre = 'Stephen William Hawking'
-
-# Effectuer la requête à l'API Google Books
-url = "https://www.googleapis.com/books/v1/volumes?q=intitle:" + titre_livre + "+inauthor:" + auteur_livre
-response = requests.get(url)
-
-# Extraire l'URL de l'image de couverture du livre à partir de la réponse JSON
-data = response.json()
-if data['totalItems'] > 0:
-    livre = data['items'][4]['volumeInfo']
-    titre = livre['title']
-    auteurs = livre['authors']
-    date_parution = livre['publishedDate']
-    resume = livre['description']
-    image_url = livre['imageLinks']['thumbnail']
-
-    # Télécharger l'image de couverture du livre
-    response = requests.get(image_url)
-    with open(titre + ".jpg", "wb") as f:
-        f.write(response.content)
-
-    # Afficher les informations du livre
-    print("Titre: ", titre)
-    print("Auteur(s): ", auteurs)
-    print("Date de parution: ", date_parution)
-    print("Résumé: ", resume)
-    print("URL de l'image de couverture: ", image_url)
-    print("L'image de couverture a été enregistrée sous le nom", titre + ".jpg")
-else:
-    print("Aucun livre trouvé avec ce titre et cet auteur.")
+directory = '/volumes/homes/Alex/ebook/test'
+files = os.listdir(directory)
 
 
-class MaClasse:
-    def __init__(self):
-        self.mes_methodes = {}
+class EbookInfoFetcher:
+    def __init__(self, path_to_book):
+        self.path_to_book = path_to_book
+        self.title = None
+        self.author = None
+        self.google_data = None
+        self.subtitle = None
+        self.publisher = None
+        self.published_date = None
+        self.description = None
+        self.categories = None
+        self.page_count = None
+        self.language = None
+        self.preview_link = None
+        self.info_link = None
+        self.image_url = None
+        self.run()
 
-    def __getattr__(self, nom):
-        if nom in self.mes_methodes:
-            return self.mes_methodes[nom]
+    def run(self):
+        self.find_title_and_author_from_file()
+        self.google_api_init()
+        self.google_api_fetch_metadata()
+        self.google_api_search_cover()
+
+    def find_title_and_author_from_file(self):
+        file_extension = self.path_to_book[-3:]
+        fetch_metadata_from_file = {'pub': self.epub_info,
+                                    'pdf': self.pdf_info}
+        fetch_metadata_from_file[file_extension]()
+
+    def epub_info(self):
+        book = epub.read_epub(self.path_to_book)
+        self.title = book.get_metadata('DC', 'title')[0][0]
+        self.author = book.get_metadata('DC', 'creator')[0][0]
+
+    def pdf_info(self):
+        book = fitz.open(self.path_to_book)
+        metadata = book.metadata
+        self.title = metadata.get("title", "unknown title")
+        self.author = metadata.get("author", "unknown author")
+        book.close()
+
+    def google_api_init(self):
+        url = f'https://www.googleapis.com/books/v1/volumes?q=intitle:' \
+              f'{self.title}inauthor:{self.author}'
+
+        response = requests.get(url)
+        self.google_data = response.json()
+
+    def google_api_fetch_metadata(self):
+        if self.google_data['totalItems'] > 0:
+            book_info = self.google_data['items'][0]['volumeInfo']
+            google_title = book_info['title']
+            book_info_item = ['subtitle', 'authors', 'publisher',
+                              'publishedDate',
+                              'description', 'categories', 'pageCount',
+                              'language',
+                              'previewLink', 'infoLink']
+
+            for item in book_info_item:
+                try:
+                    globals()[f'google_{item}'] = book_info[item]
+                except KeyError:
+                    globals()[f'google_{item}'] = None
+
+            # select 1st non null
+            self.author = ', '.join(google_authors or self.author)
+            self.title = google_title or self.title
+            self.subtitle = google_subtitle
+            self.publisher = google_publisher
+            self.published_date = google_publishedDate
+            self.description = google_description
+            self.categories = google_categories
+            self.page_count = google_pageCount
+            self.language = google_language
+            self.preview_link = google_previewLink
+            self.info_link = google_infoLink
+
         else:
-            raise AttributeError(f"{self.__class__.__name__} n'a pas l'attribut {nom}")
+            print(f'nothing found for {self.title}')
 
-    def ajouter_methode(self, nom, fonction):
-        self.mes_methodes[nom] = fonction
-        setattr(self, nom, fonction)
+    def google_api_search_cover(self):
+        if self.google_data['totalItems'] > 0:
+            for item in self.google_data['items']:
+                book_info = item['volumeInfo']
+                self.image_url = book_info.get('imageLinks', {}).get('thumbnail')
+                if self.image_url:
+                    break
 
-# Exemple d'utilisation
-def ma_methode(self):
-    print("Ma méthode a été appelée !")
-
-obj = MaClasse()
-obj.ajouter_methode("ma_methode", ma_methode)
-obj.ma_methode()
-
-# Maintenant, l'IDE devrait être en mesure de reconnaître la méthode "ma_methode" lorsqu'elle est appelée sur l'objet "obj"
-
-
-def func1():
-    print('func1')
-
-
-def func2():
-    print('func2')
-
-
-mes_methodes = {'function_1' : func1, 'function_2' : func2}
-
-class MaClasse:
-    mes_methodes = {'function_1': func1, 'function_2': func2}
-
-    def __getattr__(self, nom):
-        if nom in self.mes_methodes:
-            return self.mes_methodes[nom]
+            # todo: test if image_url not none
+            # download cover thumbnail
+            cover_file_name = '_'.join(self.title.lower().split(' '))
+            response = requests.get(self.image_url)
+            with open(cover_file_name + ".jpg", "wb") as f:
+                f.write(response.content)
         else:
-            raise AttributeError(f"{self.__class__.__name__} n'a pas l'attribut {nom}")
-
-class MaClasse:
-    def __init__(self):
-        self.mes_methodes = {}
-
-    def __getattr__(self, nom):
-        if nom in self.mes_methodes:
-            return self.mes_methodes[nom]
-        else:
-            raise AttributeError(f"{self.__class__.__name__} n'a pas l'attribut {nom}")
-
-    def ajouter_methode(self, nom, fonction):
-        self.mes_methodes[nom] = fonction
-        setattr(self, nom, fonction)
-
-# Exemple d'utilisation
-def ma_methode(self):
-    print("Ma méthode a été appelée !")
-
-obj = MaClasse()
-obj.ajouter_methode("ma_methode", ma_methode.__get__(obj, MaClasse))
-
-# Maintenant, l'appel de la méthode 'ma_methode' sur l'objet 'obj' ne devrait plus causer l'erreur "TypeError: ma_methode() missing 1 required positional argument: 'self'"
-obj.ma_methode()
-obj.ma_
+            pass
 
 
-toto = data['items'][0]['imageLinks']['thumbnail']
-type(toto)
-print(toto)
-
-for element in toto:
-    print(element)
-len(toto)
-
-type(data)
-print(data)
-
-ImageField
+ebook_info = EbookInfoFetcher('/volumes/homes/Alex/ebook/test/le_petit_prince.epub')
+ebook_info.title

@@ -42,3 +42,10 @@ vertical-align: bottom;
 {
 padding: 0px 20px;
 }
+
+.book-title-row {
+    color: blue; /* Couleur du texte en bleu */
+    font-size: 18px; /* Taille de police augmentée à 18px */
+    /* Vous pouvez ajouter d'autres styles de mise en forme ici si nécessaire */
+}
+

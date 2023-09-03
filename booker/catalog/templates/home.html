@@ -15,17 +15,19 @@
           {% for book in books %}
           <tr>
             <td>
-              <img alt="{{book.title}}" src="{% static book.image_path %}">
+              <img alt="{{book.title}}" src="{% static book.image %}">
             </td>
             <td class="bookname">
                 <table class="top">
-                <tr> <td> {{ book.title }} </td></tr>
-                <tr> <td> {{ book.author }} </td></tr>
+                <tr> <td class="book-title-row"> {{ book.title }} </td></tr>
+                <tr> <td> {{ book.author|default_if_none:"" }} </td></tr>
+                <tr> <td> <br> </td></tr>
+                <tr> <td> {{ book.summary_first_chars|default_if_none:""}} </td></tr>
                 </table>
             </td>
-            <td class="bottom"> year: {{ book.publication_date }} </td>
-            <td class="bottom"> language : {{ book.language }} </td>
-            <td class="bottom"> rating: {{ book.rating }} </td>
+            <td class="bottom"> year: {{ book.publication_date|default_if_none:"" }} </td>
+            <td class="bottom"> language : {{ book.language|default_if_none:"" }} </td>
+            <td class="bottom"> rating: {{ book.rating|default_if_none:""}} </td>
             <td class="bottom"> file: {{ book.file_type }} </td>
             <td class="bottom">
               <a href="{% static book.file_path %}" download>Download</a>

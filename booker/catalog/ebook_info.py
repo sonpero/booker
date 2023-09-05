@@ -7,12 +7,29 @@ from datetime import datetime
 import fitz
 from ebooklib import epub
 from PIL import Image
-# from .extract_cover import get_epub_cover, default_cover
+
+from io import StringIO
+from html.parser import HTMLParser
+
 # from booker.catalog.extract_cover import get_epub_cover, default_cover
-from .extract_cover import get_epub_cover, default_cover
+from .extract_cover import get_epub_cover
 
 directory = '/volumes/homes/Alex/ebook/test'
 files = os.listdir(directory)
+
+
+class TextStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.text = StringIO()
+
+    def handle_data(self, d):
+        self.text.write(d)
+
+    def get_data(self):
+        return self.text.getvalue()
 
 
 class EbookInfoFetcher:
@@ -38,7 +55,7 @@ class EbookInfoFetcher:
         self.run()
 
     def run(self):
-        self.find_title_and_author_from_file()
+        self.find_metadata_from_file()
         self.google_api_init()
         self.google_api_fetch_metadata()
         self.extract_cover()
@@ -46,21 +63,35 @@ class EbookInfoFetcher:
         self.set_default_cover()
         self.format_date()
 
-    def find_title_and_author_from_file(self):
+    def find_metadata_from_file(self):
         self.file_extension = self.path_to_book.split('.')[-1]
+
         fetch_metadata_from_file = {'epub': self.epub_info,
                                     'pdf': self.pdf_info,
                                     'mobi': self.epub_info}
 
-        fetch_metadata_from_file[self.file_extension]()
+        try:
+            fetch_metadata_from_file[self.file_extension]()
+        except KeyError:
+            print(f'file extension {self.file_extension} not managed')
 
     def epub_info(self):
         book = epub.read_epub(self.path_to_book)
-        try:
-            self.title = book.get_metadata('DC', 'title')[0][0]
-            self.author = book.get_metadata('DC', 'creator')[0][0]
-        except IndexError:
-            print('missing metadata')
+        topics = ['title', 'creator', 'description', 'date', 'publisher']
+        for topic in topics:
+            try:
+                string_without_html = TextStripper()
+                string_without_html.feed(book.get_metadata('DC', topic)[0][0])
+                globals()[f'epub_{topic}'] = string_without_html.get_data()
+            except IndexError:
+                globals()[f'epub_{topic}'] = None
+                print(f'missing metadata: {topic}')
+
+        self.title = epub_title
+        self.author = epub_creator
+        self.publisher = epub_publisher
+        self.published_date = epub_date
+        self.description = epub_description
 
     def pdf_info(self):
         book = fitz.open(self.path_to_book)
@@ -68,6 +99,10 @@ class EbookInfoFetcher:
         self.title = metadata.get("title", "unknown title")
         self.author = metadata.get("author", "unknown author")
         book.close()
+        if self.title == '':
+            self.title = self.path_to_book.split('/')[-1].split('.')[0]
+        else:
+            pass
 
     def google_api_init(self):
         url = f'https://www.googleapis.com/books/v1/volumes?q=intitle:' \
@@ -78,7 +113,6 @@ class EbookInfoFetcher:
     def google_api_fetch_metadata(self):
         if self.google_data['totalItems'] > 0:
             book_info = self.google_data['items'][0]['volumeInfo']
-            google_title = book_info['title']
             book_info_item = ['subtitle', 'authors', 'publisher',
                               'publishedDate',
                               'description', 'categories', 'pageCount',
@@ -93,11 +127,10 @@ class EbookInfoFetcher:
 
             # select 1st non null
             self.author = ', '.join(google_authors or self.author)
-            self.title = self.title
             self.subtitle = google_subtitle
-            self.publisher = google_publisher
-            self.published_date = google_publishedDate
-            self.description = google_description
+            self.publisher = self.publisher or google_publisher
+            self.published_date = self.published_date or google_publishedDate
+            self.description = self.description or google_description
             self.categories = google_categories
             self.page_count = google_pageCount
             self.language = google_language
@@ -132,7 +165,6 @@ class EbookInfoFetcher:
                     if self.image_url:
                         break
 
-                # todo: test if image_url not none
                 # download cover thumbnail
                 cover_file_name = '_'.join(self.title.lower().split(' '))[:50]
                 response = requests.get(self.image_url)
@@ -152,51 +184,25 @@ class EbookInfoFetcher:
             pass
 
     def format_date(self):
-        if self.published_date is not None:
+        if (self.published_date is not None) \
+                and (type(self.published_date) == str):
             if str(len(self.published_date.split('-'))) == '1':
                 date_obj = datetime.strptime(self.published_date, "%Y")
             elif str(len(self.published_date.split('-'))) == '2':
                 date_obj = datetime.strptime(self.published_date, "%Y-%m")
-            else:
-                date_obj = datetime.strptime(self.published_date, "%Y-%m-%d")
+            elif str(len(self.published_date.split('-'))) > '2':
+                date_obj = datetime.strptime(self.published_date.split('T')[0],
+                                             "%Y-%m-%d")
             self.published_date = date_obj.strftime("%Y-%m-%d")
         else:
             pass
 
     def set_default_cover(self):
         if self.absolute_local_path_cover is None:
-            image = default_cover(self.title)
-            standard_size = (250, 400)
-            image.resize(standard_size)
-            cover_file_name = '_'.join(self.title.lower().split(' '))
             self.absolute_local_path_cover = \
-                f'/volumes/homes/Alex/ebook/test/cover/{cover_file_name}.jpg'
-            self.relative_local_path_cover = f'cover/{cover_file_name}.jpg'
-            image.save(self.absolute_local_path_cover)
-
-
+                f'/volumes/homes/Alex/ebook/test/cover/default_cover.jpeg'
+            self.relative_local_path_cover = f'cover/default_cover.jpeg'
+        else:
+            pass
 
 # ebook_info = EbookInfoFetcher('/volumes/homes/Alex/ebook/test/le_petit_prince.epub')
-# ebook_info = EbookInfoFetcher('/volumes/homes/Alex/ebook/test/Microsoft_AZURE_DP-900_Data_Fundamentals_by_Abound_Academy.epub')
-# ebook_info = EbookInfoFetcher('/volumes/homes/Alex/ebook/test/Docker Complete Guide To Docker For Beginners And Intermediates (Code tutorials Book 6) (Berg, Craig) (Z-Library).epub')
-path = '/volumes/homes/Alex/ebook/test/le_petit_prince.epub'
-# import ebooklib
-# from ebooklib import epub
-# book = epub.read_epub(path)
-#
-# for item in book.get_items():
-#     if item.get_type() == ebooklib.ITEM_DOCUMENT:
-#         print('==================================')
-#         print('NAME : ', item.get_name())
-#         print('----------------------------------')
-#         print(item.get_content())
-#         print('==================================')
-#
-# cover_image = book.get_item_with_id('cover')
-# book.get_metadata('DC', 'title')
-# book.get_metadata('DC', 'creator')
-# book.get_metadata('DC', 'description')
-# book.get_metadata('DC', 'date')
-# book.get_metadata('DC', 'identifier')
-# book.get_metadata('DC', 'coverage')
-# book.get_metadata('DC', 'publisher')

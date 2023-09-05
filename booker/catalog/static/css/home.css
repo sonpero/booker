@@ -1,7 +1,9 @@
 /*set default font and resized text properly for edge and safari */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap');
+
 html
 {
-font-family: sans-serif;
+font-family: 'Nunito', sans-serif;
 -webkit-text-size-adjust: 100%;
 -ms-text-size-adjust: 100%;
 }
@@ -16,12 +18,14 @@ h1
 color: #1c1f21;
 padding: 50px 0;
 text-align: center;
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-table
-{
-margin : 40px 100px;
+table {
+  margin: 40px 100px;
+  max-width: 900px;
 }
+
 
 .bookname
 {
@@ -44,8 +48,52 @@ padding: 0px 20px;
 }
 
 .book-title-row {
-    color: blue; /* Couleur du texte en bleu */
-    font-size: 18px; /* Taille de police augmentée à 18px */
-    /* Vous pouvez ajouter d'autres styles de mise en forme ici si nécessaire */
+    color: #49AFD0;
+    font-size: 24px;
 }
 
+/* Style de la barre de recherche */
+.search-bar {
+    width: 400px; /* Largeur de la barre de recherche */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    font-size: 16px;
+    outline: none;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Style du bouton de recherche */
+.search-button {
+    background-color: #4285f4; /* Couleur de fond similaire à Google */
+    color: #fff; /* Couleur du texte */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+}
+header {
+    text-align: center;
+}
+
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 500px;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #4285f4;
+    color: #fff;
+    border-radius: 3px;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #357ebd;
+}

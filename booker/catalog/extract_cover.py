@@ -142,31 +142,3 @@ def get_epub_cover(epub_path):
 # image = Image.open('/volumes/homes/Alex/ebook/test/cover/Une breve histoire du temps.jpg')
 # image.show()
 # image.size
-
-# -----> define generic cover
-
-
-def default_cover(book_name):
-    # define size
-    img = Image.new('RGB', (600, 800), color='black')
-
-    # add book's tittle
-    text = book_name
-    font_size = 120
-    font = ImageFont.load_default()
-
-    # define center
-    width, height = img.size
-    center_x = width // 2
-    center_y = height // 2
-
-    # display book's name on background
-    draw = ImageDraw.Draw(img)
-    draw.text((center_x - font_size / 2, center_y - font_size / 2),
-              text, fill=(255, 255, 255), font=font)
-
-    return img
-
-# img.show()
-# # Enregistrer l'image sous forme de fichier JPEG
-# img.save('question_mark.jpg')

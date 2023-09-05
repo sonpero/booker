@@ -10,6 +10,11 @@
   <body>
       <header>
           <h1>Library</h1>
+          <form action="/search/" method="get">
+              <input type="text" name="q" class="search-bar" placeholder="Search books...">
+              <button type="submit" class="search-button">Search</button>
+          </form>
+          <td> <br> </td>
       </header>
         <table>
           {% for book in books %}
@@ -22,7 +27,8 @@
                 <tr> <td class="book-title-row"> {{ book.title }} </td></tr>
                 <tr> <td> {{ book.author|default_if_none:"" }} </td></tr>
                 <tr> <td> <br> </td></tr>
-                <tr> <td> {{ book.summary_first_chars|default_if_none:""}} </td></tr>
+                <tr> <td>
+                    {{ book.summary_first_chars|default_if_none:""}} </td></tr>
                 </table>
             </td>
             <td class="bottom"> year: {{ book.publication_date|default_if_none:"" }} </td>
@@ -33,8 +39,29 @@
               <a href="{% static book.file_path %}" download>Download</a>
             </td>
           </tr>
+          <tr> <td> <br> </td></tr>
           {% endfor %}
         </table>
+
+      <div class="pagination">
+        <span class="step-links">
+            {% if books.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ books.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current-page">
+                Page {{ books.number }} of {{ books.paginator.num_pages }}.
+            </span>
+
+            {% if books.has_next %}
+                <a href="?page={{ books.next_page_number }}">next</a>
+                <a href="?page={{ books.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+    <td> <br> </td>
+    <td> <br> </td>
   </body>
 </html>
 

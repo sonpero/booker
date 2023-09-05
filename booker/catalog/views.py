@@ -1,6 +1,9 @@
 import os
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.core.paginator import Paginator
+from PIL import Image
+
 from .models import Book
 from .ebook_info import EbookInfoFetcher
 
@@ -10,7 +13,10 @@ def index(request):
 
 
 def home(request):
-    books = Book.objects.all()
+    books_list = Book.objects.all()
+    paginator = Paginator(books_list, 4)
+    page = request.GET.get('page')
+    books = paginator.get_page(page)
     return render(request, 'home.html', {'books': books})
 
 
@@ -19,8 +25,18 @@ def add_book(request):
     return render(request, 'add_book.html')#, {'book': book})
 
 
+def resize_default_cover():
+    image = Image.open(
+        f'/volumes/homes/Alex/ebook/test/cover/default_cover.jpeg')
+    standard_size = (250, 400)
+    image = image.resize(standard_size)
+    image = image.convert("RGB")
+    image.save(f'/volumes/homes/Alex/ebook/test/cover/default_cover.jpeg')
+
+
 def init_database(request):
     directory = '/volumes/homes/Alex/ebook/test'
+    resize_default_cover()
     files = os.listdir(directory)
     filtered_files = [file for file in files if os.path.isfile(
         os.path.join(directory, file)) and not file.startswith('.')]

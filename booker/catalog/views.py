@@ -47,7 +47,7 @@ def init_database(request):
         ebook_info = EbookInfoFetcher(path)
         Book.objects.create(image_path=ebook_info.absolute_local_path_cover,
                             image=ebook_info.relative_local_path_cover,
-                            title=ebook_info.title,
+                            title=ebook_info.title[:198],
                             author=ebook_info.author,
                             publication_date=ebook_info.published_date,
                             language=ebook_info.language,

@@ -1,6 +1,7 @@
 
 # ----->    extract info from book file
 import os
+import re
 import requests
 from datetime import datetime
 # PyMuPDF
@@ -15,6 +16,7 @@ from html.parser import HTMLParser
 from .extract_cover import get_epub_cover
 
 directory = '/volumes/homes/Alex/ebook/test'
+# directory = '/app/test'
 files = os.listdir(directory)
 
 
@@ -193,7 +195,10 @@ class EbookInfoFetcher:
             elif str(len(self.published_date.split('-'))) > '2':
                 date_obj = datetime.strptime(self.published_date.split('T')[0],
                                              "%Y-%m-%d")
-            self.published_date = date_obj.strftime("%Y-%m-%d")
+            if re.match(r"\d{4}-\d{2}-\d{2}", date_obj.strftime("%Y-%m-%d")):
+                self.published_date = date_obj.strftime("%Y-%m-%d")
+            else:
+                self.published_date = None
         else:
             pass
 

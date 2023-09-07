@@ -4,7 +4,6 @@
 import os
 import zipfile
 from lxml import etree
-from PIL import Image, ImageDraw, ImageFont
 
 # Let's define the required XML namespaces
 namespaces = {
@@ -131,14 +130,3 @@ def get_epub_cover(epub_path):
 
         # We return the image
         return z.open(cover_path)
-
-# epubfile = '/volumes/homes/Alex/ebook/test/le_petit_prince.epub'
-# epubfile = '/volumes/homes/Alex/ebook/test/Docker Complete Guide To Docker For Beginners And Intermediates (Code tutorials Book 6) (Berg, Craig) (Z-Library).epub'
-# cover = get_epub_cover(epubfile)
-# image = Image.open(cover)
-# image.show()
-# image.size
-#
-# image = Image.open('/volumes/homes/Alex/ebook/test/cover/Une breve histoire du temps.jpg')
-# image.show()
-# image.size

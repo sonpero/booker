@@ -34,6 +34,7 @@ services:
     volumes:
       - /tmp/app/mysqld:/run/mysqld
       - .:/app
+      - /Volumes/homes/Alex/ebook/test:/volumes/homes/Alex/ebook/test
     depends_on:
       db:
         condition: service_healthy

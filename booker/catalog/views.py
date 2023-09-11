@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from PIL import Image
 
 from .models import Book
-from .ebook_info import EbookInfoFetcher
+from .ebook_info import EbookInfoFetcher, MetadataExplorer, GoogleApiCaller
 
 
 def index(request):
@@ -37,6 +37,7 @@ def resize_default_cover():
 def init_database(request):
     directory = '/volumes/homes/Alex/ebook/test'
     resize_default_cover()
+
     files = os.listdir(directory)
     filtered_files = [file for file in files if os.path.isfile(
         os.path.join(directory, file)) and not file.startswith('.')]
@@ -44,7 +45,14 @@ def init_database(request):
     for file in filtered_files:
         path = f'{directory}/{file}'
         print(path)
-        ebook_info = EbookInfoFetcher(path)
+        metadata_from_file = MetadataExplorer(path).run()
+        metadata_from_google = GoogleApiCaller(metadata_from_file).run()
+
+        ebook_info = EbookInfoFetcher(metadata_from_file,
+                                      metadata_from_google)
+
+        ebook_info.run()
+
         Book.objects.create(image_path=ebook_info.absolute_local_path_cover,
                             image=ebook_info.relative_local_path_cover,
                             title=ebook_info.title[:198],

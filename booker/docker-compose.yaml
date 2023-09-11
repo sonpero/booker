@@ -12,17 +12,14 @@ services:
       - MYSQL_HOST=${DB_HOST}
       - MYSQL_PORT=${DB_PORT}
     volumes:
-      - /tmp/app/mysqld:/var/run/mysqld
-      - ../db:/var/lib/mysql
+      - /volume1/docker/booker/app/mysqld:/var/run/mysqld
+      - /volume1/docker/booker/db:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 50s
       retries: 10
   web:
-    build: .
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+    image: sonpero/booker-web:1.0.0
     ports:
       - "8000:8000"
     environment:
@@ -32,10 +29,11 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
     volumes:
-      - /tmp/app/mysqld:/run/mysqld
-      - .:/app
-      - /Volumes/homes/Alex/ebook/test:/volumes/homes/Alex/ebook/test
+      - /volume1/docker/booker/app/mysqld:/run/mysqld
+      - /volume1/homes/Alex/ebook/test:/volumes/homes/Alex/ebook/test
     depends_on:
       db:
         condition: service_healthy
-        restart: true
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"

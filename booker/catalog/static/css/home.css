@@ -52,7 +52,7 @@ padding: 0px 20px;
     font-size: 24px;
 }
 
-/* Style de la barre de recherche */
+/* search bar */
 .search-bar {
     width: 400px; /* Largeur de la barre de recherche */
     padding: 10px;
@@ -63,7 +63,7 @@ padding: 0px 20px;
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Style du bouton de recherche */
+/* search bar button */
 .search-button {
     background-color: #4285f4; /* Couleur de fond similaire à Google */
     color: #fff; /* Couleur du texte */
@@ -77,6 +77,7 @@ header {
     text-align: center;
 }
 
+/* page buttons */
 .pagination {
     text-align: center;
     margin-top: 20px;
@@ -96,4 +97,11 @@ header {
 
 .pagination a:hover {
     background-color: #357ebd;
+}
+
+/* add new book button */
+.btn.btn-primary {
+    border-radius: 50px;
+    margin: 10px 160px;
+    background-color: #4285f4;
 }

@@ -10,8 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
+from catalog.configuration import storage_directory
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -74,29 +77,29 @@ WSGI_APPLICATION = 'booker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'booker_db',
-#         'USER': 'root',
-#         'PASSWORD': 'Moskito1',
-#         'HOST': '127.0.0.1',
-#         'PORT': '3306',
-#         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"}
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
-        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+        'NAME': 'booker_db',
+        'USER': 'root',
+        'PASSWORD': 'Moskito1',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"}
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD'),
+#         'HOST': os.environ.get('DB_HOST'),
+#         'PORT': os.environ.get('DB_PORT'),
+#         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+#     }
+# }
 
 
 # Password validation
@@ -137,8 +140,10 @@ STATIC_URL = 'static/'
 MEDIA_URL = 'media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATICFILES_DIRS = ['/volumes/homes/Alex/ebook/test/']
-MEDIAFILES_DIRS = ['/volumes/homes/Alex/ebook/test/']
+MEDIA_ROOT = f'{storage_directory}/'
+
+STATICFILES_DIRS = [f'{storage_directory}/']
+MEDIAFILES_DIRS = [f'{storage_directory}/']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

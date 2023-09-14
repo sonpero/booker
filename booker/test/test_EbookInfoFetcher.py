@@ -5,7 +5,7 @@ from PIL import Image
 import booker.catalog.configuration as conf
 from booker.catalog.ebook_info import EbookInfoFetcher
 
-directory = conf.directory
+directory = conf.storage_directory
 path_to_test_book = f'{directory}/le_petit_prince.epub'
 # Define sample metadata for testing
 sample_metadata_from_file = {

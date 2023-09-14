@@ -1,4 +1,4 @@
 """
 
 """
-directory = '/volumes/homes/Alex/ebook/test'
+storage_directory = '/volumes/homes/Alex/ebook/test'

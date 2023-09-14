@@ -12,13 +12,12 @@ from typing import Type
 import fitz
 from ebooklib import epub
 
-import booker.catalog.configuration as conf
-# from booker.catalog.extract_cover import get_epub_cover
+from .configuration import storage_directory
 from .extract_cover import get_epub_cover
 
 
-directory = conf.directory
-files = os.listdir(directory)
+# directory = conf.directory
+files = os.listdir(storage_directory)
 
 
 class MetadataExplorer:
@@ -248,7 +247,7 @@ class EbookInfoFetcher:
 
         cover_file_name = '_'.join(self.title.lower().split(' '))[:50]
         self.absolute_local_path_cover = \
-            f'{directory}/cover/{cover_file_name}.jpg'
+            f'{storage_directory}/cover/{cover_file_name}.jpg'
         self.relative_local_path_cover = f'cover/{cover_file_name}.jpg'
 
         image.save(self.absolute_local_path_cover)
@@ -296,7 +295,7 @@ class EbookInfoFetcher:
 
     def set_default_cover(self) -> None:
         self.absolute_local_path_cover = \
-            f'{directory}/cover/default_cover.jpeg'
+            f'{storage_directory}/cover/default_cover.jpeg'
         self.relative_local_path_cover = f'cover/default_cover.jpeg'
 
 

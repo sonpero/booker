@@ -21,3 +21,10 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+
+class UploadBook(models.Model):
+    book_file = models.FileField(upload_to='./',
+                                 blank=True, null=True)
+
+    def __str__(self):
+        return self.book_file.file.name

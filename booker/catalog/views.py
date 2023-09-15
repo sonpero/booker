@@ -18,10 +18,12 @@ def index(request):
 
 def home(request):
     books_list = Book.objects.all().order_by('title')
+    book_count = books_list.count()
     paginator = Paginator(books_list, 4)
     page = request.GET.get('page')
     books = paginator.get_page(page)
-    return render(request, 'home.html', {'books': books})
+    return render(request, 'home.html', {'books': books,
+                                         'book_count': book_count})
 
 
 def upload_book(request):
@@ -90,6 +92,18 @@ def insert_book_info_in_database(path):
         summary=ebook_info.description,
         genre=ebook_info.categories,
         file_path=ebook_info.relative_path_to_book)
+
+
+def search_view(request):
+    search_term = request.GET.get('q', '')
+    books_list = Book.objects.filter(title__icontains=search_term)
+    book_count = books_list.count()
+    paginator = Paginator(books_list, 4)
+    page = request.GET.get('page')
+    books = paginator.get_page(page)
+    return render(request, 'home.html',
+                  {'books': books, 'search_term': search_term,
+                   'book_count': book_count})
 
 
 def resize_default_cover():

@@ -8,14 +8,17 @@
       <link rel="stylesheet" href="{% static 'css/home.css' %}">
   </head>
   <body>
+
       <header>
           <h1>Library</h1>
-          <form action="/search/" method="get">
+          <form action="search" method="get">
               <input type="text" name="q" class="search-bar" placeholder="Search books...">
               <button type="submit" class="search-button">Search</button>
           </form>
           <td> <br> </td>
+          <p>Total books found: {{ book_count }}</p>
       </header>
+
       <a href="{% url 'upload_book' %}" class="btn btn-primary">Add New Book</a>
         <table>
           {% for book in books %}
@@ -47,8 +50,8 @@
       <div class="pagination">
         <span class="step-links">
             {% if books.has_previous %}
-                <a href="?page=1">&laquo; first</a>
-                <a href="?page={{ books.previous_page_number }}">previous</a>
+                <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; first</a>
+                <a href="?page={{ books.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
             {% endif %}
 
             <span class="current-page">
@@ -56,8 +59,8 @@
             </span>
 
             {% if books.has_next %}
-                <a href="?page={{ books.next_page_number }}">next</a>
-                <a href="?page={{ books.paginator.num_pages }}">last &raquo;</a>
+                <a href="?page={{ books.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
+                <a href="?page={{ books.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">last &raquo;</a>
             {% endif %}
         </span>
     </div>

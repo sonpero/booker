@@ -101,7 +101,11 @@ header {
 /* add new book button */
 .btn.btn-primary {
     border-radius: 50px;
-    margin: 10px 160px;
+    margin: 10px 100px;
     background-color: #4285f4;
+}
+
+.btn.btn-primary.home-button {
+    margin-right: -50px;
 }
 

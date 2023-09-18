@@ -19,7 +19,7 @@ services:
       timeout: 50s
       retries: 10
   web:
-    image: sonpero/booker-web:1.0.0
+    image: sonpero/booker-web:1.1.0
     ports:
       - "8000:8000"
     environment:
@@ -30,7 +30,7 @@ services:
       - DB_PORT=${DB_PORT}
     volumes:
       - /volume1/docker/booker/app/mysqld:/run/mysqld
-      - /volume1/homes/Alex/ebook/test:/volumes/homes/Alex/ebook/test
+      - /volume1/homes/web_library:/volumes/homes/web_library
     depends_on:
       db:
         condition: service_healthy

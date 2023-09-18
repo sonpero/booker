@@ -19,6 +19,7 @@
           <p>Total books found: {{ book_count }}</p>
       </header>
 
+      <a href="{% url 'home' %}" class="btn btn-primary home-button">Home</a>
       <a href="{% url 'upload_book' %}" class="btn btn-primary">Add New Book</a>
         <table>
           {% for book in books %}

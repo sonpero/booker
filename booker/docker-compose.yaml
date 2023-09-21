@@ -18,8 +18,10 @@ services:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 50s
       retries: 10
+    networks:
+      - django-network
   web:
-    image: sonpero/booker-web:1.1.0
+    image: sonpero/booker-web:1.1.1
     ports:
       - "8000:8000"
     environment:
@@ -28,12 +30,32 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - ENV=${ENV}
     volumes:
       - /volume1/docker/booker/app/mysqld:/run/mysqld
       - /volume1/homes/web_library:/volumes/homes/web_library
+    networks:
+      - django-network
     depends_on:
       db:
         condition: service_healthy
     command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             gunicorn --bind 0.0.0.0:8000 booker.wsgi --workers=2"
+  nginx:
+    image: sonpero/booker-nginx:1.1.1
+    restart: always
+    volumes:
+      - /volume1/homes/web_library:/app/static
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    networks:
+      - django-network
+networks:
+  django-network:
+    name: django-network

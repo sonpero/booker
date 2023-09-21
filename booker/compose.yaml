@@ -18,11 +18,14 @@ services:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 50s
       retries: 10
+    networks:
+      - django-network
   web:
     build: .
     command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             gunicorn --bind 0.0.0.0:8000 booker.wsgi --workers=2"
     ports:
       - "8000:8000"
     environment:
@@ -38,7 +41,23 @@ services:
       - /tmp/app/mysqld:/run/mysqld
       - .:/app
       - /Volumes/homes/Alex/ebook/test:/volumes/homes/Alex/ebook/test
+    networks:
+      - django-network
     depends_on:
       db:
         condition: service_healthy
         restart: true
+  nginx:
+    build: nginx
+    restart: always
+    volumes:
+      - /Volumes/homes/Alex/ebook/test:/app/static
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    networks:
+      - django-network
+networks:
+  django-network:
+    name: django-network

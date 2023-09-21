@@ -4,3 +4,4 @@ mysqlclient==2.2.0
 EbookLib==0.18
 PyMuPDF==1.23.1
 Pillow==10.0.0
+gunicorn==21.2.0

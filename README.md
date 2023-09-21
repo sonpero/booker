@@ -13,13 +13,17 @@ the same level as manage.py)
   
 **.env:**  
 Create a .env file at the same level as manage.py  
-and set your database configuration
+and set your database configuration and django deployment parameters  
+(DJANGO_DEBUG : True or False, ENV=prd or dev)
 
 DB_NAME=  
 DB_USER=  
 DB_PASSWORD=  
 DB_HOST=db_mysql  
 DB_PORT=3306  
+DJANGO_SECRET_KEY  
+DJANGO_DEBUG  
+ENV  
 
 **compose.yaml:**  
 Used for development    
@@ -29,4 +33,22 @@ With synology path, take care of the "V" in capital letter
 **docker-compose.yaml:**  
 Used for production mode on synology NAS
 In "Volumes" define storage directory for production  
-In "image" define the version to use
+In "image" define the version to use  
+
+**Deployment actions:**  
+docker build -t sonpero/booker-web .  
+docker tag sonpero/booker-web sonpero/booker-web:x.x.x  
+docker push sonpero/booker-web:1.1.0  
+
+In Synology NAS :  
+Upload docker-compose.yaml  
+sudo docker-compose up  
+
+Note:  
+To init database : suppress and create again db directory  
+In the booker-web container : python manage.py createsuperuser  
+
+
+
+
+

@@ -44,7 +44,7 @@ services:
     command: >
       sh -c "python manage.py makemigrations &&
              python manage.py migrate &&
-             gunicorn --bind 0.0.0.0:8000 booker.wsgi --workers=2"
+             gunicorn --bind 0.0.0.0:8000 booker.wsgi --workers=2 --timeout=1200"
   nginx:
     image: sonpero/booker-nginx:1.1.1
     restart: always

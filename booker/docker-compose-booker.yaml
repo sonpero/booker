@@ -1,0 +1,50 @@
+services:
+  db:
+    container_name: 'db_mysql'
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_HOST=${DB_HOST}
+      - MYSQL_PORT=${DB_PORT}
+    volumes:
+      - /volume1/docker/booker/app/mysqld:/var/run/mysqld
+      - /volume1/docker/booker/db:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 50s
+      retries: 10
+    networks:
+      - django-network
+  web:
+    image: sonpero/booker-web:1.1.1
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - ENV=${ENV}
+    volumes:
+      - /volume1/docker/booker/app/mysqld:/run/mysqld
+      - /volume1/homes/web_library:/volumes/homes/web_library
+    networks:
+      - django-network
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             gunicorn --bind 0.0.0.0:8000 booker.wsgi --workers=2"
+networks:
+  django-network:
+    name: django-network
